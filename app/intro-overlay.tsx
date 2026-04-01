@@ -10,6 +10,9 @@ import {
 import type { CSSProperties } from "react";
 
 const BG = "#00254D";
+/** Pretendard Bold 40 / 44, letter-spacing 0 (globals.css --font-sans = Pretendard) */
+const headlineTypography =
+  "font-sans font-bold text-[40px] leading-[44px] tracking-normal";
 /** 밑줄(underscore)의 초기 너비 — 처음부터 div 선으로 표시 */
 const UNDERLINE_START_PX = 12;
 const GROW_RIGHT_MS = 1200;
@@ -204,9 +207,9 @@ export function IntroOverlay() {
       aria-hidden
     >
       <div className="relative flex h-full w-full items-center justify-center px-6">
-        <div className="relative z-10 flex flex-col items-center gap-1 text-center">
+        <div className="relative z-10 flex w-max max-w-full flex-col items-start gap-1 text-left">
           <p
-            className={`text-2xl font-semibold tracking-tight text-white transition-opacity duration-300 ease-out sm:text-3xl ${
+            className={`${headlineTypography} text-white transition-opacity duration-300 ease-out ${
               showText ? "opacity-100" : "pointer-events-none opacity-0"
             }`}
           >
@@ -214,7 +217,7 @@ export function IntroOverlay() {
           </p>
           <div className="relative inline-flex items-end">
             <span
-              className={`text-2xl font-semibold tracking-tight text-white transition-opacity duration-300 ease-out sm:text-3xl ${
+              className={`${headlineTypography} text-white transition-opacity duration-300 ease-out ${
                 showText ? "opacity-100" : "pointer-events-none opacity-0"
               }`}
             >
