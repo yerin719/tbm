@@ -28,7 +28,7 @@ export function HeroTopSlideIn() {
       alt=""
       width={556}
       height={87}
-      className="absolute bottom-[-26] left-0 h-auto w-full select-none will-change-[transform,opacity] transition-[transform,opacity] ease-out"
+      className="absolute bottom-[-66px] left-0 h-auto w-full select-none will-change-[transform,opacity] transition-[transform,opacity] ease-out"
       style={{
         transitionDuration: `${SLIDE_IN_MS}ms`,
         transform: shown ? "translateX(0)" : `translateX(${FROM_X_PX}px)`,
