@@ -7,6 +7,7 @@ import { HeroTopSlideIn } from "./hero-top-slide-in";
 import { HeroBottomSlideIn } from "./hero-bottom-slide-in";
 import { HeroLinesShift } from "./hero-lines-shift";
 import { ShipScrollSection } from "./ship-scroll-section";
+import { BusinessIntroSection } from "./business-intro-section";
 
 const anton = Anton({
   weight: "400",
@@ -80,10 +81,11 @@ export default function Home() {
           <section className="min-h-screen" />
           <section className="min-h-screen" />
           <section className="min-h-screen" />
-          <section className="min-h-screen" />
-          <section className="min-h-[120vh]" />
+          <section className="min-h-[50vh]" />
         </div>
       </main>
+
+      <BusinessIntroSection />
 
       <footer className="border-t border-black/5 py-6 text-center text-xs text-zinc-500">
         © {new Date().getFullYear()} TBM SHIPPING. All rights reserved.

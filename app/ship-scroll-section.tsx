@@ -136,14 +136,18 @@ export function ShipScrollSection() {
             invalidateOnRefresh: true,
             start: () => {
               const el = document.querySelector<HTMLElement>("#phase2-content");
-              const y = el ? el.getBoundingClientRect().top + window.scrollY : 0;
+              const y = el
+                ? el.getBoundingClientRect().top + window.scrollY
+                : 0;
               const afterHeroEndY = y + 200 + window.innerHeight * 1.1;
               const gapEndY = afterHeroEndY + 300 + window.innerHeight * 0.35;
               return `top+=${gapEndY + 40} top`;
             },
             end: () => {
               const el = document.querySelector<HTMLElement>("#phase2-content");
-              const y = el ? el.getBoundingClientRect().top + window.scrollY : 0;
+              const y = el
+                ? el.getBoundingClientRect().top + window.scrollY
+                : 0;
               const afterHeroEndY = y + 200 + window.innerHeight * 1.1;
               const gapEndY = afterHeroEndY + 300 + window.innerHeight * 0.35;
               return `top+=${gapEndY + 40 + window.innerHeight * 0.9} top`;
@@ -163,14 +167,18 @@ export function ShipScrollSection() {
             trigger: document.body,
             start: () => {
               const el = document.querySelector<HTMLElement>("#phase2-content");
-              const y = el ? el.getBoundingClientRect().top + window.scrollY : 0;
+              const y = el
+                ? el.getBoundingClientRect().top + window.scrollY
+                : 0;
               const afterHeroEndY = y + 200 + window.innerHeight * 1.1;
               const gapEndY = afterHeroEndY + 300 + window.innerHeight * 0.35;
               return `top+=${gapEndY + 40} top`;
             },
             end: () => {
               const el = document.querySelector<HTMLElement>("#phase2-content");
-              const y = el ? el.getBoundingClientRect().top + window.scrollY : 0;
+              const y = el
+                ? el.getBoundingClientRect().top + window.scrollY
+                : 0;
               const afterHeroEndY = y + 200 + window.innerHeight * 1.1;
               const gapEndY = afterHeroEndY + 300 + window.innerHeight * 0.35;
               return `top+=${gapEndY + 40 + window.innerHeight * 0.45} top`;
@@ -179,6 +187,33 @@ export function ShipScrollSection() {
           },
         });
       }
+
+      // Phase 3 동시: 사업소개 텍스트 페이드인
+      ScrollTrigger.create({
+        trigger: document.body,
+        start: () => {
+          const el = document.querySelector<HTMLElement>("#phase2-content");
+          const y = el ? el.getBoundingClientRect().top + window.scrollY : 0;
+          const afterHeroEndY = y + 200 + window.innerHeight * 1.1;
+          const gapEndY = afterHeroEndY + 300 + window.innerHeight * 0.35;
+          return `top+=${gapEndY + 40} top`;
+        },
+        end: () => {
+          const el = document.querySelector<HTMLElement>("#phase2-content");
+          const y = el ? el.getBoundingClientRect().top + window.scrollY : 0;
+          const afterHeroEndY = y + 200 + window.innerHeight * 1.1;
+          const gapEndY = afterHeroEndY + 300 + window.innerHeight * 0.35;
+          return `top+=${gapEndY + 40 + window.innerHeight * 0.9} top`;
+        },
+        scrub: 1,
+        onUpdate: (self) => {
+          const bizText =
+            document.querySelector<HTMLElement>("[data-biz-text]");
+          if (bizText) {
+            gsap.set(bizText, { opacity: self.progress });
+          }
+        },
+      });
     });
 
     return () => ctx.revert();
@@ -193,6 +228,7 @@ export function ShipScrollSection() {
   return (
     <div
       ref={shipRef}
+      data-ship-overlay
       className="pointer-events-none fixed z-30"
       style={{ visibility: "hidden", willChange: "transform" }}
     >
