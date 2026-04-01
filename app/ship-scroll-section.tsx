@@ -32,6 +32,7 @@ export function ShipScrollSection() {
       items.truck,
       items.safe,
     ].filter(Boolean) as HTMLElement[];
+    const nonShipItems = afterHeroItems;
 
     gsap.set(ship, {
       visibility: "visible",
@@ -46,6 +47,7 @@ export function ShipScrollSection() {
     if (row) {
       gsap.set(row, { "--pad": "0px" });
     }
+    gsap.set([...shipItem, ...afterHeroItems], { opacity: 1 });
 
     const ctx = gsap.context(() => {
       // Phase 1: hero를 고정(pin)하고 ship만 먼저 올라옴
@@ -93,15 +95,74 @@ export function ShipScrollSection() {
             trigger: document.body,
             start: () => {
               const el = document.querySelector<HTMLElement>("#phase2-content");
-              const y = el ? el.getBoundingClientRect().top + window.scrollY : 0;
+              const y = el
+                ? el.getBoundingClientRect().top + window.scrollY
+                : 0;
               const afterHeroEndY = y + 200 + window.innerHeight * 1.1;
               return `top+=${afterHeroEndY + 300} top`;
             },
             end: () => {
               const el = document.querySelector<HTMLElement>("#phase2-content");
-              const y = el ? el.getBoundingClientRect().top + window.scrollY : 0;
+              const y = el
+                ? el.getBoundingClientRect().top + window.scrollY
+                : 0;
               const afterHeroEndY = y + 200 + window.innerHeight * 1.1;
               return `top+=${afterHeroEndY + 300 + window.innerHeight * 0.35} top`;
+            },
+            scrub: 1,
+          },
+        });
+      }
+
+      // Phase 3: 간격이 벌어진 이후 추가 스크롤에서 ship 확대/좌측 이동 + 나머지 숨김
+      if (items.ship) {
+        gsap.to(items.ship, {
+          scale: 1.85,
+          x: () => -Math.max(140, window.innerWidth * 0.18),
+          transformOrigin: "left center",
+          ease: "none",
+          scrollTrigger: {
+            trigger: document.body,
+            start: () => {
+              const el = document.querySelector<HTMLElement>("#phase2-content");
+              const y = el ? el.getBoundingClientRect().top + window.scrollY : 0;
+              const afterHeroEndY = y + 200 + window.innerHeight * 1.1;
+              const gapEndY = afterHeroEndY + 300 + window.innerHeight * 0.35;
+              return `top+=${gapEndY + 40} top`;
+            },
+            end: () => {
+              const el = document.querySelector<HTMLElement>("#phase2-content");
+              const y = el ? el.getBoundingClientRect().top + window.scrollY : 0;
+              const afterHeroEndY = y + 200 + window.innerHeight * 1.1;
+              const gapEndY = afterHeroEndY + 300 + window.innerHeight * 0.35;
+              return `top+=${gapEndY + 40 + window.innerHeight * 0.9} top`;
+            },
+            scrub: 1,
+          },
+        });
+      }
+
+      if (nonShipItems.length > 0) {
+        gsap.to(nonShipItems, {
+          opacity: 0,
+          scale: 0.96,
+          ease: "none",
+          stagger: 0.02,
+          scrollTrigger: {
+            trigger: document.body,
+            start: () => {
+              const el = document.querySelector<HTMLElement>("#phase2-content");
+              const y = el ? el.getBoundingClientRect().top + window.scrollY : 0;
+              const afterHeroEndY = y + 200 + window.innerHeight * 1.1;
+              const gapEndY = afterHeroEndY + 300 + window.innerHeight * 0.35;
+              return `top+=${gapEndY + 40} top`;
+            },
+            end: () => {
+              const el = document.querySelector<HTMLElement>("#phase2-content");
+              const y = el ? el.getBoundingClientRect().top + window.scrollY : 0;
+              const afterHeroEndY = y + 200 + window.innerHeight * 1.1;
+              const gapEndY = afterHeroEndY + 300 + window.innerHeight * 0.35;
+              return `top+=${gapEndY + 40 + window.innerHeight * 0.45} top`;
             },
             scrub: 1,
           },
