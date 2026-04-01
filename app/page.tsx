@@ -78,6 +78,7 @@ export default function Home() {
         <div id="phase2-content">
           <section className="min-h-screen" />
           <section className="min-h-screen" />
+          <section className="min-h-screen" />
         </div>
       </main>
 

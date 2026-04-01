@@ -16,6 +16,7 @@ export function ShipScrollSection() {
     const ship = shipRef.current;
     if (!ship) return;
 
+    const row = ship.querySelector<HTMLElement>('[data-row="images"]');
     const items = {
       buynow: ship.querySelector<HTMLElement>('[data-item="buynow"]'),
       airplane: ship.querySelector<HTMLElement>('[data-item="airplane"]'),
@@ -42,6 +43,9 @@ export function ShipScrollSection() {
     });
 
     gsap.set([...shipItem, ...afterHeroItems], { y: window.innerHeight });
+    if (row) {
+      gsap.set(row, { "--pad": "0px" });
+    }
 
     const ctx = gsap.context(() => {
       // Phase 1: hero를 고정(pin)하고 ship만 먼저 올라옴
@@ -74,22 +78,35 @@ export function ShipScrollSection() {
           end: () => {
             const el = document.querySelector<HTMLElement>("#phase2-content");
             const y = el ? el.getBoundingClientRect().top + window.scrollY : 0;
-            return `top+=${y + 200 + window.innerHeight * 0.6} top`;
+            return `top+=${y + 200 + window.innerHeight * 1.1} top`;
           },
-          scrub: 1,
+          scrub: 1.6,
         },
       });
 
-      // Phase 2 끝 부분에서 배 페이드아웃
-      gsap.to(ship, {
-        opacity: 0,
-        scrollTrigger: {
-          trigger: "#phase2-content",
-          start: "80% center",
-          end: "bottom center",
-          scrub: true,
-        },
-      });
+      // 이미지가 정렬된 뒤 추가 스크롤에서 간격(총 4px)을 서서히 생성
+      if (row) {
+        gsap.to(row, {
+          "--pad": "4px",
+          ease: "none",
+          scrollTrigger: {
+            trigger: document.body,
+            start: () => {
+              const el = document.querySelector<HTMLElement>("#phase2-content");
+              const y = el ? el.getBoundingClientRect().top + window.scrollY : 0;
+              const afterHeroEndY = y + 200 + window.innerHeight * 1.1;
+              return `top+=${afterHeroEndY + 300} top`;
+            },
+            end: () => {
+              const el = document.querySelector<HTMLElement>("#phase2-content");
+              const y = el ? el.getBoundingClientRect().top + window.scrollY : 0;
+              const afterHeroEndY = y + 200 + window.innerHeight * 1.1;
+              return `top+=${afterHeroEndY + 300 + window.innerHeight * 0.35} top`;
+            },
+            scrub: 1,
+          },
+        });
+      }
     });
 
     return () => ctx.revert();
@@ -107,8 +124,20 @@ export function ShipScrollSection() {
       className="pointer-events-none fixed z-30"
       style={{ visibility: "hidden", willChange: "transform" }}
     >
-      <div className="flex w-screen items-end">
-        <div className="relative aspect-256/470 w-1/5" data-item="buynow">
+      <div
+        className="flex w-screen items-end"
+        data-row="images"
+        style={{
+          gap: "calc(var(--pad) * 2)",
+          marginLeft: "calc(var(--pad) * -1)",
+          marginRight: "calc(var(--pad) * -1)",
+        }}
+      >
+        <div
+          className="relative aspect-256/470 w-1/5"
+          data-item="buynow"
+          style={{ paddingLeft: "var(--pad)", paddingRight: "var(--pad)" }}
+        >
           <Image
             src="/buynow.png"
             alt="구매"
@@ -118,7 +147,11 @@ export function ShipScrollSection() {
             priority
           />
         </div>
-        <div className="relative aspect-256/470 w-1/5" data-item="airplane">
+        <div
+          className="relative aspect-256/470 w-1/5"
+          data-item="airplane"
+          style={{ paddingLeft: "var(--pad)", paddingRight: "var(--pad)" }}
+        >
           <Image
             src="/airplane.png"
             alt="비행기"
@@ -128,7 +161,11 @@ export function ShipScrollSection() {
             priority
           />
         </div>
-        <div className="relative aspect-256/470 w-1/5" data-item="ship">
+        <div
+          className="relative aspect-256/470 w-1/5"
+          data-item="ship"
+          style={{ paddingLeft: "var(--pad)", paddingRight: "var(--pad)" }}
+        >
           <Image
             src="/ship.png"
             alt="화물선"
@@ -138,7 +175,11 @@ export function ShipScrollSection() {
             priority
           />
         </div>
-        <div className="relative aspect-256/470 w-1/5" data-item="truck">
+        <div
+          className="relative aspect-256/470 w-1/5"
+          data-item="truck"
+          style={{ paddingLeft: "var(--pad)", paddingRight: "var(--pad)" }}
+        >
           <Image
             src="/truck.png"
             alt="트럭"
@@ -148,7 +189,11 @@ export function ShipScrollSection() {
             priority
           />
         </div>
-        <div className="relative aspect-256/470 w-1/5" data-item="safe">
+        <div
+          className="relative aspect-256/470 w-1/5"
+          data-item="safe"
+          style={{ paddingLeft: "var(--pad)", paddingRight: "var(--pad)" }}
+        >
           <Image
             src="/safe.png"
             alt="금고"
