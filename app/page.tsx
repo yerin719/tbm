@@ -1,75 +1,117 @@
 import Link from "next/link";
+import { Anton } from "next/font/google";
+import { FloatingActions } from "./floating-actions";
+
+const anton = Anton({
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const navItems = [
+  { href: "#about", label: "회사소개" },
+  { href: "#business", label: "사업영역" },
+  { href: "#board", label: "게시판" },
+] as const;
+
+const pillLinks = [
+  { href: "/login", label: "LOGIN" },
+  { href: "/register", label: "REGISTER" },
+  { href: "/my", label: "MY" },
+  { href: "#search", label: "SEARCH" },
+] as const;
+
+function HeadlineLine({
+  initial,
+  rest,
+}: {
+  initial: string;
+  rest: string;
+}) {
+  return (
+    <span className="block">
+      <span className="text-[var(--tbm-blue)]">{initial}</span>
+      <span className="text-black">{rest}</span>
+    </span>
+  );
+}
 
 export default function Home() {
   return (
-    <div className="flex min-h-full flex-col">
-      <header className="border-b border-zinc-200/80 bg-white/80 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-950/80">
-        <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-6">
-          <span className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-            TBM
-          </span>
-          <nav className="flex gap-6 text-sm text-zinc-600 dark:text-zinc-400">
-            <Link
-              href="#"
-              className="transition-colors hover:text-zinc-900 dark:hover:text-zinc-50"
-            >
-              소개
-            </Link>
-            <Link
-              href="#"
-              className="transition-colors hover:text-zinc-900 dark:hover:text-zinc-50"
-            >
-              문의
-            </Link>
+    <div className="flex min-h-screen flex-col bg-white text-black">
+      <header className="h-[54px] shrink-0">
+        <div className="mx-auto flex h-full max-w-[1320px] flex-nowrap items-center justify-between gap-3 px-5 md:gap-4 md:px-8">
+          <Link
+            href="/"
+            className="group shrink-0 text-[14px] font-semibold leading-[18px] not-italic"
+          >
+            <span className="text-[var(--tbm-maroon)]">TBM</span>{" "}
+            <span className="text-black">SHIPPING</span>
+          </Link>
+
+          <nav
+            className="flex min-w-0 flex-1 justify-center gap-4 text-[13px] font-medium text-black sm:gap-6 sm:text-[14px] md:gap-8 md:text-[15px]"
+            aria-label="주 메뉴"
+          >
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="transition-opacity hover:opacity-70"
+              >
+                {item.label}
+              </Link>
+            ))}
           </nav>
+
+          <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+            {pillLinks.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="inline-flex h-8 min-w-[3.5rem] shrink-0 items-center justify-center rounded-full border border-black px-2 text-[10px] font-semibold tracking-wide text-black transition hover:bg-black hover:text-white sm:min-w-[4rem] sm:px-3 sm:text-[11px] md:h-9 md:min-w-[4.25rem] md:text-xs"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
         </div>
       </header>
 
-      <main className="flex flex-1 flex-col">
-        <section className="relative flex flex-1 flex-col items-center justify-center px-6 py-24 sm:py-32">
-          <div
-            className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(120,119,198,0.15),transparent)] dark:bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(120,119,198,0.12),transparent)]"
-            aria-hidden
-          />
-          <div className="mx-auto max-w-2xl text-center">
-            <p className="mb-4 text-sm font-medium text-violet-600 dark:text-violet-400">
-              환영합니다
-            </p>
-            <h1 className="text-balance text-4xl font-semibold tracking-tight text-zinc-900 sm:text-5xl dark:text-zinc-50">
-              당신의 사이트를
-              <br />
-              여기서 시작하세요
-            </h1>
-            <p className="mt-6 text-pretty text-lg leading-relaxed text-zinc-600 dark:text-zinc-400">
-              Next.js App Router와 Tailwind CSS로 구성된 프로젝트입니다.
-              <code className="mx-1 rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-sm text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200">
-                app/page.tsx
-              </code>
-              를 수정해 홈을 꾸며 보세요.
-            </p>
-            <div className="mt-10 flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-4">
-              <Link
-                href="https://nextjs.org/docs"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex h-11 min-w-[140px] items-center justify-center rounded-full bg-zinc-900 px-6 text-sm font-medium text-white transition hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
-              >
-                문서 보기
-              </Link>
-              <Link
-                href="#"
-                className="inline-flex h-11 min-w-[140px] items-center justify-center rounded-full border border-zinc-300 bg-transparent px-6 text-sm font-medium text-zinc-900 transition hover:bg-zinc-50 dark:border-zinc-600 dark:text-zinc-100 dark:hover:bg-zinc-900"
-              >
-                더 알아보기
-              </Link>
-            </div>
+      <main className="flex w-full flex-1 flex-col">
+        <section
+          className="flex min-h-[calc(100dvh-54px)] w-full flex-1 flex-col items-center justify-center px-5 py-10 md:px-8 md:py-12"
+          aria-labelledby="hero-heading"
+        >
+          <p className="mb-[26px] text-center text-[14px] font-semibold leading-[18px] text-black not-italic">
+            TBM SHIPPING
+          </p>
+
+          <h1
+            id="hero-heading"
+            className={`${anton.className} max-w-[min(100%,920px)] text-center font-normal uppercase text-[clamp(2rem,10vw,100px)] leading-[1.06] tracking-[0.02em] md:text-[100px] md:leading-[106px]`}
+          >
+            <HeadlineLine initial="T" rest="RUST IN EVERY STEP" />
+            <HeadlineLine initial="B" rest="EYOND THE BORDER" />
+            <HeadlineLine initial="M" rest="ASTER OF LOGISTICS" />
+          </h1>
+
+          <div className="mt-[32px]">
+            <Link
+              href="#consult"
+              className="inline-flex h-[54px] w-[139px] items-center justify-center rounded-full bg-[var(--tbm-maroon)] px-2 text-[13px] font-semibold leading-tight text-white shadow-sm transition hover:brightness-95 sm:text-[14px]"
+            >
+              빠른 상담 문의
+            </Link>
           </div>
         </section>
       </main>
 
-      <footer className="border-t border-zinc-200 py-8 text-center text-sm text-zinc-500 dark:border-zinc-800 dark:text-zinc-500">
-        © {new Date().getFullYear()} TBM. All rights reserved.
+      <footer className="border-t border-black/5 py-6 text-center text-xs text-zinc-500">
+        © {new Date().getFullYear()} TBM SHIPPING. All rights reserved.
       </footer>
+
+      <FloatingActions />
     </div>
   );
 }

@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "홈",
-  description: "메인 페이지",
+  title: "TBM SHIPPING",
+  description: "TBM SHIPPING — 물류의 모든 단계에서 신뢰를 더합니다.",
 };
 
 export default function RootLayout({

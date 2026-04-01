@@ -4,6 +4,8 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --tbm-maroon: #6b1c2e;
+  --tbm-blue: #1769ff;
   --font-family-base:
     "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 }
@@ -13,13 +15,6 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-family-base);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
