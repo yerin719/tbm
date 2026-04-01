@@ -15,8 +15,8 @@ const UNDERLINE_START_PX = 12;
 const GROW_RIGHT_MS = 1200;
 const TEXT_FADE_MS = 400;
 const GROW_LEFT_MS = 1200;
-const OVERLAY_HOLD_MS = 5000;
-const OVERLAY_FADE_MS = 300;
+const WHITE_EXPAND_MS = 900;
+const EXIT_FADE_MS = 400;
 
 type LineGeom = {
   startLeft: number;
@@ -24,18 +24,21 @@ type LineGeom = {
   fullWidth: number;
 };
 
+type Phase = "measure" | "growRight" | "textOut" | "growLeft" | "whiteExpand";
+
 export function IntroOverlay() {
   const lineRef = useRef<HTMLDivElement>(null);
   const [geom, setGeom] = useState<LineGeom | null>(null);
+  const [viewportH, setViewportH] = useState(0);
   const [mounted, setMounted] = useState(true);
   const [overlayFade, setOverlayFade] = useState(false);
   /** growLeft: absolute → fixed 정렬 후 left/width 애니메이션 시작 */
   const [growLeftReady, setGrowLeftReady] = useState(false);
+  /** 흰색 커튼 scaleY 시작 */
+  const [whiteExpandGo, setWhiteExpandGo] = useState(false);
 
   const [showText, setShowText] = useState(true);
-  const [phase, setPhase] = useState<
-    "measure" | "growRight" | "textOut" | "growLeft" | "done"
-  >("measure");
+  const [phase, setPhase] = useState<Phase>("measure");
 
   const measure = useCallback(() => {
     const el = lineRef.current;
@@ -50,10 +53,16 @@ export function IntroOverlay() {
 
   useLayoutEffect(() => {
     measure();
+    if (typeof window !== "undefined") {
+      setViewportH(window.innerHeight);
+    }
   }, [measure]);
 
   useEffect(() => {
-    const onResize = () => measure();
+    const onResize = () => {
+      measure();
+      setViewportH(window.innerHeight);
+    };
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, [measure]);
@@ -91,24 +100,33 @@ export function IntroOverlay() {
 
   useEffect(() => {
     if (phase !== "growLeft" || !growLeftReady) return;
-    const t = window.setTimeout(() => setPhase("done"), GROW_LEFT_MS);
+    const t = window.setTimeout(() => setPhase("whiteExpand"), GROW_LEFT_MS);
     return () => window.clearTimeout(t);
   }, [phase, growLeftReady]);
 
   useEffect(() => {
-    const fadeTimer = window.setTimeout(
-      () => setOverlayFade(true),
-      OVERLAY_HOLD_MS
-    );
-    const removeTimer = window.setTimeout(
-      () => setMounted(false),
-      OVERLAY_HOLD_MS + OVERLAY_FADE_MS
-    );
-    return () => {
-      window.clearTimeout(fadeTimer);
-      window.clearTimeout(removeTimer);
-    };
-  }, []);
+    if (phase !== "whiteExpand") {
+      setWhiteExpandGo(false);
+      return;
+    }
+    setWhiteExpandGo(false);
+    const id = requestAnimationFrame(() => {
+      requestAnimationFrame(() => setWhiteExpandGo(true));
+    });
+    return () => cancelAnimationFrame(id);
+  }, [phase]);
+
+  useEffect(() => {
+    if (phase !== "whiteExpand") return;
+    const t = window.setTimeout(() => setOverlayFade(true), WHITE_EXPAND_MS);
+    return () => window.clearTimeout(t);
+  }, [phase]);
+
+  useEffect(() => {
+    if (!overlayFade) return;
+    const t = window.setTimeout(() => setMounted(false), EXIT_FADE_MS);
+    return () => window.clearTimeout(t);
+  }, [overlayFade]);
 
   if (!mounted) return null;
 
@@ -117,7 +135,8 @@ export function IntroOverlay() {
   const lineTop = geom?.lineTop ?? 0;
   const rightSegmentWidth = Math.max(0, fullWidth - startLeft);
 
-  const useFixedLine = phase === "growLeft" || phase === "done";
+  const useFixedLine = phase === "growLeft";
+  const showLine = phase !== "whiteExpand";
 
   const inlineWidth =
     phase === "measure"
@@ -160,12 +179,28 @@ export function IntroOverlay() {
     fixedStyle = {};
   }
 
+  /** h-0.5와 동일(2px) — 흰 띠 높이와 맞춤 */
+  const lineStripH = 2;
+  const vh =
+    viewportH || (typeof window !== "undefined" ? window.innerHeight : 0);
+  /** 선 중심이 화면 중앙이 아니면 vh/2 스케일로는 위·아래 끝에 못 닿음 → 더 먼 쪽 끝까지 닿도록 */
+  const stripCenterY = lineTop + lineStripH / 2;
+  const expandScaleY =
+    vh > 0 && lineStripH > 0
+      ? (2 * Math.max(stripCenterY, vh - stripCenterY)) / lineStripH
+      : 1;
+
   return (
     <div
-      className={`fixed inset-0 z-9999 transition-opacity duration-300 ease-out ${
-        overlayFade ? "pointer-events-none opacity-0" : "pointer-events-auto opacity-100"
+      className={`fixed inset-0 z-9999 transition-opacity ease-out ${
+        overlayFade
+          ? "pointer-events-none opacity-0"
+          : "pointer-events-auto opacity-100 duration-300"
       }`}
-      style={{ backgroundColor: BG }}
+      style={{
+        backgroundColor: BG,
+        transitionDuration: overlayFade ? `${EXIT_FADE_MS}ms` : undefined,
+      }}
       aria-hidden
     >
       <div className="relative flex h-full w-full items-center justify-center px-6">
@@ -177,7 +212,6 @@ export function IntroOverlay() {
           >
             정확하고
           </p>
-          {/* 안전한 + 밑줄: 밑줄은 처음부터 div 한 개 (텍스트만 페이드) */}
           <div className="relative inline-flex items-end">
             <span
               className={`text-2xl font-semibold tracking-tight text-white transition-opacity duration-300 ease-out sm:text-3xl ${
@@ -186,26 +220,42 @@ export function IntroOverlay() {
             >
               안전한
             </span>
-            <div
-              ref={lineRef}
-              className={`h-0.5 shrink-0 bg-white will-change-[width,left] ${
-                useFixedLine ? "" : "absolute bottom-0 left-full z-20"
-              }`}
-              style={
-                useFixedLine
-                  ? fixedStyle
-                  : {
-                      width: inlineWidth,
-                      transition:
-                        phase === "growRight"
-                          ? `width ${GROW_RIGHT_MS}ms cubic-bezier(0.22, 1, 0.36, 1)`
-                          : "none",
-                    }
-              }
-            />
+            {showLine && (
+              <div
+                ref={lineRef}
+                className={`h-0.5 shrink-0 bg-white will-change-[width,left] ${
+                  useFixedLine ? "" : "absolute bottom-0.5 left-full z-20"
+                }`}
+                style={
+                  useFixedLine
+                    ? fixedStyle
+                    : {
+                        width: inlineWidth,
+                        transition:
+                          phase === "growRight"
+                            ? `width ${GROW_RIGHT_MS}ms cubic-bezier(0.22, 1, 0.36, 1)`
+                            : "none",
+                      }
+                }
+              />
+            )}
           </div>
         </div>
       </div>
+
+      {/* 가로 선이 끝난 뒤: 같은 높이의 흰 띠가 위아래로 scaleY로 펼쳐짐 */}
+      {phase === "whiteExpand" && geom && vh > 0 && (
+        <div
+          className="pointer-events-none fixed inset-x-0 z-30 bg-white will-change-transform"
+          style={{
+            top: lineTop - 1,
+            height: lineStripH,
+            transform: whiteExpandGo ? `scaleY(${expandScaleY})` : "scaleY(1)",
+            transformOrigin: "center center",
+            transition: `transform ${WHITE_EXPAND_MS}ms cubic-bezier(0.22, 1, 0.36, 1)`,
+          }}
+        />
+      )}
     </div>
   );
 }
