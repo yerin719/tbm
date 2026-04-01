@@ -5,21 +5,13 @@ import { SiteHeader } from "./site-header";
 import { InEveryStep } from "./in-every-step";
 import { HeroTopSlideIn } from "./hero-top-slide-in";
 import { HeroBottomSlideIn } from "./hero-bottom-slide-in";
+import { HeroLinesShift } from "./hero-lines-shift";
 
 const anton = Anton({
   weight: "400",
   subsets: ["latin"],
   display: "swap",
 });
-
-function HeadlineLine({ initial, rest }: { initial: string; rest: string }) {
-  return (
-    <span className="block">
-      <span className="text-(--tbm-blue)">{initial}</span>
-      <span className="text-black">{rest}</span>
-    </span>
-  );
-}
 
 export default function Home() {
   return (
@@ -58,8 +50,7 @@ export default function Home() {
             </span>
             <span className="relative block">
               <span className="relative z-0 block">
-                <HeadlineLine initial="B" rest="EYOND THE BORDER" />
-                <HeadlineLine initial="M" rest="ASTER OF LOGISTICS" />
+                <HeroLinesShift />
               </span>
               <span
                 className="pointer-events-none absolute left-[252px] top-2 z-10 h-[192px] w-[470px] -translate-x-1/2 overflow-hidden rounded-[12px]"
