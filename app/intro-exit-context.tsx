@@ -4,6 +4,8 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
+  useLayoutEffect,
   useMemo,
   useState,
 } from "react";
@@ -25,7 +27,24 @@ export function useIntroExit() {
 
 export function IntroExitProvider({ children }: { children: React.ReactNode }) {
   const [introDone, setIntroDone] = useState(false);
-  const onExitComplete = useCallback(() => setIntroDone(true), []);
+
+  useLayoutEffect(() => {
+    history.scrollRestoration = "manual";
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
+    if (introDone) return;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [introDone]);
+
+  const onExitComplete = useCallback(() => {
+    window.scrollTo(0, 0);
+    setIntroDone(true);
+  }, []);
 
   const value = useMemo(() => ({ introDone }), [introDone]);
 
