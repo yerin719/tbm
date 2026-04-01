@@ -31,6 +31,11 @@ type Phase = "measure" | "growRight" | "textOut" | "growLeft" | "whiteExpand";
 
 export function IntroOverlay() {
   const lineRef = useRef<HTMLDivElement>(null);
+  /** 글씨 페이드 후 measure 값이 달라지며 fixed 선이 한 번 더 움직이는 것 방지 */
+  const [lockedLineGeom, setLockedLineGeom] = useState<{
+    top: number;
+    left: number;
+  } | null>(null);
   const [geom, setGeom] = useState<LineGeom | null>(null);
   const [viewportH, setViewportH] = useState(0);
   const [mounted, setMounted] = useState(true);
@@ -131,12 +136,30 @@ export function IntroOverlay() {
     return () => window.clearTimeout(t);
   }, [overlayFade]);
 
+  useLayoutEffect(() => {
+    if (phase !== "textOut") return;
+    setLockedLineGeom((prev) => {
+      if (prev != null) return prev;
+      const el = lineRef.current;
+      if (!el) return prev;
+      const r = el.getBoundingClientRect();
+      return { top: r.top, left: r.left };
+    });
+  }, [phase]);
+
   if (!mounted) return null;
 
   const fullWidth = geom?.fullWidth ?? 0;
   const startLeft = geom?.startLeft ?? 0;
   const lineTop = geom?.lineTop ?? 0;
   const rightSegmentWidth = Math.max(0, fullWidth - startLeft);
+
+  const useLockedLineGeom = phase === "growLeft" || phase === "whiteExpand";
+  const lineTopForAnim =
+    useLockedLineGeom && lockedLineGeom ? lockedLineGeom.top : lineTop;
+  const startLeftForAnim =
+    useLockedLineGeom && lockedLineGeom ? lockedLineGeom.left : startLeft;
+  const rightSegmentForAnim = Math.max(0, fullWidth - startLeftForAnim);
 
   const useFixedLine = phase === "growLeft";
   const showLine = phase !== "whiteExpand";
@@ -153,16 +176,16 @@ export function IntroOverlay() {
     if (phase === "growLeft" && !growLeftReady) {
       fixedStyle = {
         position: "fixed",
-        top: lineTop,
-        left: startLeft,
-        width: rightSegmentWidth,
+        top: lineTopForAnim,
+        left: startLeftForAnim,
+        width: rightSegmentForAnim,
         transition: "none",
         zIndex: 20,
       };
     } else if (phase === "growLeft" && growLeftReady) {
       fixedStyle = {
         position: "fixed",
-        top: lineTop,
+        top: lineTopForAnim,
         left: 0,
         width: fullWidth,
         transition: `width ${GROW_LEFT_MS}ms cubic-bezier(0.22, 1, 0.36, 1), left ${GROW_LEFT_MS}ms cubic-bezier(0.22, 1, 0.36, 1)`,
@@ -171,7 +194,7 @@ export function IntroOverlay() {
     } else {
       fixedStyle = {
         position: "fixed",
-        top: lineTop,
+        top: lineTopForAnim,
         left: 0,
         width: fullWidth,
         transition: "none",
@@ -182,12 +205,12 @@ export function IntroOverlay() {
     fixedStyle = {};
   }
 
-  /** h-0.5와 동일(2px) — 흰 띠 높이와 맞춤 */
-  const lineStripH = 2;
+  /** 밑줄·흰 확장 띠 높이와 맞춤 */
+  const lineStripH = 3;
   const vh =
     viewportH || (typeof window !== "undefined" ? window.innerHeight : 0);
   /** 선 중심이 화면 중앙이 아니면 vh/2 스케일로는 위·아래 끝에 못 닿음 → 더 먼 쪽 끝까지 닿도록 */
-  const stripCenterY = lineTop + lineStripH / 2;
+  const stripCenterY = lineTopForAnim + lineStripH / 2;
   const expandScaleY =
     vh > 0 && lineStripH > 0
       ? (2 * Math.max(stripCenterY, vh - stripCenterY)) / lineStripH
@@ -207,7 +230,7 @@ export function IntroOverlay() {
       aria-hidden
     >
       <div className="relative flex h-full w-full items-center justify-center px-6">
-        <div className="relative z-10 flex w-max max-w-full flex-col items-start gap-1 text-left">
+        <div className="relative z-10 -mt-10 flex w-max max-w-full flex-col items-start gap-1 text-left sm:-mt-12">
           <p
             className={`${headlineTypography} text-white transition-opacity duration-300 ease-out ${
               showText ? "opacity-100" : "pointer-events-none opacity-0"
@@ -226,7 +249,7 @@ export function IntroOverlay() {
             {showLine && (
               <div
                 ref={lineRef}
-                className={`h-0.5 shrink-0 bg-white will-change-[width,left] ${
+                className={`h-[4px] shrink-0 bg-white will-change-[width,left] ${
                   useFixedLine ? "" : "absolute bottom-0.5 left-full z-20"
                 }`}
                 style={
@@ -251,7 +274,7 @@ export function IntroOverlay() {
         <div
           className="pointer-events-none fixed inset-x-0 z-30 bg-white will-change-transform"
           style={{
-            top: lineTop - 1,
+            top: lineTopForAnim,
             height: lineStripH,
             transform: whiteExpandGo ? `scaleY(${expandScaleY})` : "scaleY(1)",
             transformOrigin: "center center",
