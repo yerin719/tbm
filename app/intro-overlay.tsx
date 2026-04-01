@@ -230,7 +230,7 @@ export function IntroOverlay() {
       aria-hidden
     >
       <div className="relative flex h-full w-full items-center justify-center px-6">
-        <div className="relative z-10 -mt-10 flex w-max max-w-full flex-col items-start gap-1 text-left sm:-mt-12">
+        <div className="relative z-10 flex w-max max-w-full flex-col items-start gap-1 text-left">
           <p
             className={`${headlineTypography} text-white transition-opacity duration-300 ease-out ${
               showText ? "opacity-100" : "pointer-events-none opacity-0"
@@ -250,7 +250,9 @@ export function IntroOverlay() {
               <div
                 ref={lineRef}
                 className={`h-[4px] shrink-0 bg-white will-change-[width,left] ${
-                  useFixedLine ? "" : "absolute bottom-0.5 left-full z-20"
+                  useFixedLine
+                    ? ""
+                    : "-translate-y-[3px] absolute bottom-0.5 left-full z-20"
                 }`}
                 style={
                   useFixedLine
