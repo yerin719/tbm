@@ -22,3 +22,8 @@ body {
   color: var(--foreground);
   font-family: var(--font-family-base);
 }
+
+html,
+body {
+  overflow-x: clip;
+}
