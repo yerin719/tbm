@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Anton } from "next/font/google";
 import { FloatingActions } from "./floating-actions";
 import { SiteHeader } from "./site-header";
@@ -9,13 +10,7 @@ const anton = Anton({
   display: "swap",
 });
 
-function HeadlineLine({
-  initial,
-  rest,
-}: {
-  initial: string;
-  rest: string;
-}) {
+function HeadlineLine({ initial, rest }: { initial: string; rest: string }) {
   return (
     <span className="block">
       <span className="text-[var(--tbm-blue)]">{initial}</span>
@@ -42,7 +37,24 @@ export default function Home() {
             id="hero-heading"
             className={`${anton.className} max-w-[min(100%,920px)] text-center font-normal uppercase text-[clamp(2rem,10vw,100px)] leading-[1.06] tracking-[0.02em] md:text-[100px] md:leading-[106px]`}
           >
-            <HeadlineLine initial="T" rest="RUST IN EVERY STEP" />
+            <span className="relative block">
+              <span className="relative z-0 block">
+                <HeadlineLine initial="T" rest="RUST IN EVERY STEP" />
+              </span>
+              <span
+                className="pointer-events-none absolute left-[540px] top-[20px] z-10 h-[70px] w-[556px] -translate-x-1/2 overflow-hidden rounded-[8px]"
+                aria-hidden
+              >
+                <Image
+                  src="/hero-top.png"
+                  alt=""
+                  width={556}
+                  height={87}
+                  className="absolute bottom-[-10px] left-0 h-auto w-full select-none"
+                  priority
+                />
+              </span>
+            </span>
             <HeadlineLine initial="B" rest="EYOND THE BORDER" />
             <HeadlineLine initial="M" rest="ASTER OF LOGISTICS" />
           </h1>
