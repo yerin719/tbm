@@ -1,8 +1,9 @@
 import Link from "next/link";
-import Image from "next/image";
 import { Anton } from "next/font/google";
 import { FloatingActions } from "./floating-actions";
 import { SiteHeader } from "./site-header";
+import { InEveryStep } from "./in-every-step";
+import { HeroTopSlideIn } from "./hero-top-slide-in";
 
 const anton = Anton({
   weight: "400",
@@ -13,7 +14,7 @@ const anton = Anton({
 function HeadlineLine({ initial, rest }: { initial: string; rest: string }) {
   return (
     <span className="block">
-      <span className="text-[var(--tbm-blue)]">{initial}</span>
+      <span className="text-(--tbm-blue)">{initial}</span>
       <span className="text-black">{rest}</span>
     </span>
   );
@@ -39,20 +40,19 @@ export default function Home() {
           >
             <span className="relative block">
               <span className="relative z-0 block">
-                <HeadlineLine initial="T" rest="RUST IN EVERY STEP" />
+                <span className="block">
+                  <span className="text-(--tbm-blue)">T</span>
+                  <span className="text-black">RUST </span>
+                  <span className="text-black">
+                    <InEveryStep />
+                  </span>
+                </span>
               </span>
               <span
-                className="pointer-events-none absolute left-[540px] top-[20px] z-10 h-[70px] w-[556px] -translate-x-1/2 overflow-hidden rounded-[8px]"
+                className="pointer-events-none absolute left-[540px] top-[8px] z-10 h-[87px] w-[556px] -translate-x-1/2 overflow-hidden rounded-[8px]"
                 aria-hidden
               >
-                <Image
-                  src="/hero-top.png"
-                  alt=""
-                  width={556}
-                  height={87}
-                  className="absolute bottom-[-10px] left-0 h-auto w-full select-none"
-                  priority
-                />
+                <HeroTopSlideIn />
               </span>
             </span>
             <HeadlineLine initial="B" rest="EYOND THE BORDER" />
@@ -62,7 +62,7 @@ export default function Home() {
           <div className="mt-[32px]">
             <Link
               href="#consult"
-              className="inline-flex h-[54px] w-[139px] items-center justify-center rounded-full bg-[var(--tbm-maroon)] px-2 text-[16px] font-bold leading-[22px] tracking-normal text-white not-italic shadow-sm transition hover:brightness-95"
+              className="inline-flex h-[54px] w-[139px] items-center justify-center rounded-full bg-(--tbm-maroon) px-2 text-[16px] font-bold leading-[22px] tracking-normal text-white not-italic shadow-sm transition hover:brightness-95"
             >
               빠른 상담 문의
             </Link>
