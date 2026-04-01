@@ -6,6 +6,7 @@ import { InEveryStep } from "./in-every-step";
 import { HeroTopSlideIn } from "./hero-top-slide-in";
 import { HeroBottomSlideIn } from "./hero-bottom-slide-in";
 import { HeroLinesShift } from "./hero-lines-shift";
+import { ShipScrollSection } from "./ship-scroll-section";
 
 const anton = Anton({
   weight: "400",
@@ -18,9 +19,12 @@ export default function Home() {
     <div className="flex min-h-screen flex-col bg-white pt-[54px] text-black">
       <SiteHeader />
 
+      <ShipScrollSection />
+
       <main className="flex w-full flex-1 flex-col">
         <section
-          className="flex min-h-[calc(100dvh-54px)] w-full flex-1 flex-col items-center justify-center px-5 py-10 md:px-8 md:py-12"
+          id="hero-section"
+          className="flex min-h-[calc(100dvh-54px)] w-full flex-col items-center justify-center px-5 py-10 md:px-8 md:py-12"
           aria-labelledby="hero-heading"
         >
           <p className="mb-[26px] text-center text-[14px] font-semibold leading-[18px] text-black not-italic">
@@ -70,6 +74,11 @@ export default function Home() {
             </Link>
           </div>
         </section>
+
+        <div id="phase2-content">
+          <section className="min-h-screen" />
+          <section className="min-h-screen" />
+        </div>
       </main>
 
       <footer className="border-t border-black/5 py-6 text-center text-xs text-zinc-500">
