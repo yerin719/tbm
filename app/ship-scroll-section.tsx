@@ -117,12 +117,23 @@ export function ShipScrollSection() {
       // Phase 3: 간격이 벌어진 이후 추가 스크롤에서 ship 확대/좌측 이동 + 나머지 숨김
       if (items.ship) {
         gsap.to(items.ship, {
-          scale: 1.85,
-          x: () => -Math.max(140, window.innerWidth * 0.18),
-          transformOrigin: "left center",
+          scale: () => {
+            const r = items.ship!.getBoundingClientRect();
+            return window.innerHeight / Math.max(1, r.height);
+          },
+          x: () => {
+            const r = items.ship!.getBoundingClientRect();
+            return -r.left;
+          },
+          y: () => {
+            const r = items.ship!.getBoundingClientRect();
+            return -r.top;
+          },
+          transformOrigin: "top left",
           ease: "none",
           scrollTrigger: {
             trigger: document.body,
+            invalidateOnRefresh: true,
             start: () => {
               const el = document.querySelector<HTMLElement>("#phase2-content");
               const y = el ? el.getBoundingClientRect().top + window.scrollY : 0;
