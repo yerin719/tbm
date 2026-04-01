@@ -1,9 +1,17 @@
 "use client";
 
+import { useIntroExit } from "./intro-exit-context";
+
 export function FloatingActions() {
+  const { introDone } = useIntroExit();
+
   return (
     <div
-      className="fixed bottom-8 right-6 z-40 flex flex-col gap-3 md:bottom-10 md:right-8"
+      className={`fixed bottom-8 right-6 z-40 flex flex-col gap-3 transition-all duration-500 ease-out will-change-transform md:bottom-10 md:right-8 ${
+        introDone
+          ? "translate-y-0 opacity-100"
+          : "translate-y-10 opacity-0 pointer-events-none"
+      }`}
       role="toolbar"
       aria-label="빠른 도구"
     >

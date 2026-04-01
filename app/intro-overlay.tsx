@@ -1,5 +1,6 @@
 "use client";
 
+import { Anton } from "next/font/google";
 import {
   useCallback,
   useEffect,
@@ -8,6 +9,12 @@ import {
   useState,
 } from "react";
 import type { CSSProperties } from "react";
+
+const anton = Anton({
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+});
 
 const BG = "#00254D";
 /** Pretendard Bold 40 / 44, letter-spacing 0 (globals.css --font-sans = Pretendard) */
@@ -18,8 +25,27 @@ const UNDERLINE_START_PX = 12;
 const GROW_RIGHT_MS = 1200;
 const TEXT_FADE_MS = 400;
 const GROW_LEFT_MS = 1200;
-const WHITE_EXPAND_MS = 900;
+/** 흰색이 위·아래로 펼쳐지는 시간 */
+const WHITE_EXPAND_MS = 2200;
 const EXIT_FADE_MS = 400;
+
+/** 홈 히어로 h1과 동일 3줄 (HeadlineLine: 첫 글자 파란 + 나머지 검정) */
+const HERO_TYPE_LINES = [
+  { full: "TRUST IN EVERY STEP" as const },
+  { full: "BEYOND THE BORDER" as const },
+  { full: "MASTER OF LOGISTICS" as const },
+] as const;
+
+const HERO_TOTAL_CHARS = HERO_TYPE_LINES.reduce((n, l) => n + l.full.length, 0);
+
+const lineStartOffsets: number[] = [];
+(() => {
+  let o = 0;
+  for (const l of HERO_TYPE_LINES) {
+    lineStartOffsets.push(o);
+    o += l.full.length;
+  }
+})();
 
 type LineGeom = {
   startLeft: number;
@@ -29,7 +55,12 @@ type LineGeom = {
 
 type Phase = "measure" | "growRight" | "textOut" | "growLeft" | "whiteExpand";
 
-export function IntroOverlay() {
+type IntroOverlayProps = {
+  /** 오버레이 페이드 아웃이 끝난 뒤(언마운트 직전) 호출 */
+  onExitComplete?: () => void;
+};
+
+export function IntroOverlay({ onExitComplete }: IntroOverlayProps) {
   const lineRef = useRef<HTMLDivElement>(null);
   /** 글씨 페이드 후 measure 값이 달라지며 fixed 선이 한 번 더 움직이는 것 방지 */
   const [lockedLineGeom, setLockedLineGeom] = useState<{
@@ -44,6 +75,8 @@ export function IntroOverlay() {
   const [growLeftReady, setGrowLeftReady] = useState(false);
   /** 흰색 커튼 scaleY 시작 */
   const [whiteExpandGo, setWhiteExpandGo] = useState(false);
+  /** whiteExpand 중 히어로 3줄 누적 타이핑 글자 수 */
+  const [heroTypedCount, setHeroTypedCount] = useState(0);
 
   const [showText, setShowText] = useState(true);
   const [phase, setPhase] = useState<Phase>("measure");
@@ -115,14 +148,32 @@ export function IntroOverlay() {
   useEffect(() => {
     if (phase !== "whiteExpand") {
       setWhiteExpandGo(false);
+      setHeroTypedCount(0);
       return;
     }
     setWhiteExpandGo(false);
+    setHeroTypedCount(0);
     const id = requestAnimationFrame(() => {
       requestAnimationFrame(() => setWhiteExpandGo(true));
     });
     return () => cancelAnimationFrame(id);
   }, [phase]);
+
+  /** 흰색이 위·아래로 열리는 동안 홈 메인과 동일 3줄 타이핑 (열림과 같은 길이) */
+  useEffect(() => {
+    if (phase !== "whiteExpand" || !whiteExpandGo) return;
+    const n = HERO_TOTAL_CHARS;
+    const start = performance.now();
+    let raf = 0;
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / WHITE_EXPAND_MS);
+      setHeroTypedCount(Math.min(n, Math.max(0, Math.ceil(t * n))));
+      if (t < 1) raf = requestAnimationFrame(tick);
+      else setHeroTypedCount(n);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [phase, whiteExpandGo]);
 
   useEffect(() => {
     if (phase !== "whiteExpand") return;
@@ -132,9 +183,12 @@ export function IntroOverlay() {
 
   useEffect(() => {
     if (!overlayFade) return;
-    const t = window.setTimeout(() => setMounted(false), EXIT_FADE_MS);
+    const t = window.setTimeout(() => {
+      onExitComplete?.();
+      setMounted(false);
+    }, EXIT_FADE_MS);
     return () => window.clearTimeout(t);
-  }, [overlayFade]);
+  }, [overlayFade, onExitComplete]);
 
   useLayoutEffect(() => {
     if (phase !== "textOut") return;
@@ -283,6 +337,46 @@ export function IntroOverlay() {
             transition: `transform ${WHITE_EXPAND_MS}ms cubic-bezier(0.22, 1, 0.36, 1)`,
           }}
         />
+      )}
+
+      {/* 흰 배경 위·홈 h1과 동일 3줄 타이포 — 세로 확장과 같은 시간에 타이핑 */}
+      {phase === "whiteExpand" && whiteExpandGo && (
+        <div
+          className={`${anton.className} pointer-events-none fixed inset-0 z-40 flex items-center justify-center px-5 text-center`}
+          aria-hidden
+        >
+          <h1 className="max-w-[min(100%,920px)] font-normal uppercase leading-[1.06] tracking-[0.02em] text-black text-[clamp(2rem,10vw,100px)] md:text-[100px] md:leading-[106px]">
+            {HERO_TYPE_LINES.map((line, lineIdx) => {
+              const start = lineStartOffsets[lineIdx] ?? 0;
+              const visible = Math.max(
+                0,
+                Math.min(line.full.length, heroTypedCount - start),
+              );
+              const showCursor =
+                heroTypedCount < HERO_TOTAL_CHARS &&
+                ((visible > 0 && visible < line.full.length) ||
+                  (visible === 0 && heroTypedCount === start && lineIdx > 0));
+
+              return (
+                <span key={line.full} className="block">
+                  {visible > 0 && (
+                    <>
+                      <span className="text-(--tbm-blue)">{line.full[0]}</span>
+                      <span className="text-black">
+                        {line.full.slice(1, visible)}
+                      </span>
+                    </>
+                  )}
+                  {showCursor && (
+                    <span className="ml-1 inline-block animate-pulse font-light text-black">
+                      |
+                    </span>
+                  )}
+                </span>
+              );
+            })}
+          </h1>
+        </div>
       )}
     </div>
   );
