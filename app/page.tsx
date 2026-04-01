@@ -4,6 +4,7 @@ import { FloatingActions } from "./floating-actions";
 import { SiteHeader } from "./site-header";
 import { InEveryStep } from "./in-every-step";
 import { HeroTopSlideIn } from "./hero-top-slide-in";
+import { HeroBottomSlideIn } from "./hero-bottom-slide-in";
 
 const anton = Anton({
   weight: "400",
@@ -55,8 +56,18 @@ export default function Home() {
                 <HeroTopSlideIn />
               </span>
             </span>
-            <HeadlineLine initial="B" rest="EYOND THE BORDER" />
-            <HeadlineLine initial="M" rest="ASTER OF LOGISTICS" />
+            <span className="relative block">
+              <span className="relative z-0 block">
+                <HeadlineLine initial="B" rest="EYOND THE BORDER" />
+                <HeadlineLine initial="M" rest="ASTER OF LOGISTICS" />
+              </span>
+              <span
+                className="pointer-events-none absolute left-[252px] top-2 z-10 h-[192px] w-[470px] -translate-x-1/2 overflow-hidden rounded-[12px]"
+                aria-hidden
+              >
+                <HeroBottomSlideIn />
+              </span>
+            </span>
           </h1>
 
           <div className="mt-[32px]">
