@@ -149,7 +149,7 @@ export function BusinessIntroSection() {
         >
           사업소개
         </p>
-        <div className="space-y-1">
+        <div className="space-y-[22px]">
           {categories.map((cat) => (
             <div key={cat.key}>
               <h3
