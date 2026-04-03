@@ -27,26 +27,35 @@ export function useIntroExit() {
 
 export function IntroExitProvider({ children }: { children: React.ReactNode }) {
   const [introDone, setIntroDone] = useState(false);
+  const onExitComplete = useCallback(() => setIntroDone(true), []);
+
+  const value = useMemo(() => ({ introDone }), [introDone]);
 
   useLayoutEffect(() => {
-    history.scrollRestoration = "manual";
+    if ("scrollRestoration" in history) {
+      history.scrollRestoration = "manual";
+    }
     window.scrollTo(0, 0);
   }, []);
 
   useEffect(() => {
     if (introDone) return;
-    document.body.style.overflow = "hidden";
+
+    const html = document.documentElement;
+    const body = document.body;
+    html.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+
     return () => {
-      document.body.style.overflow = "";
+      html.style.overflow = "";
+      body.style.overflow = "";
     };
   }, [introDone]);
 
-  const onExitComplete = useCallback(() => {
+  useEffect(() => {
+    if (!introDone) return;
     window.scrollTo(0, 0);
-    setIntroDone(true);
-  }, []);
-
-  const value = useMemo(() => ({ introDone }), [introDone]);
+  }, [introDone]);
 
   return (
     <IntroExitContext.Provider value={value}>

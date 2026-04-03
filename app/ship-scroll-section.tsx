@@ -116,45 +116,56 @@ export function ShipScrollSection() {
 
       // Phase 3: 간격이 벌어진 이후 추가 스크롤에서 ship 확대/좌측 이동 + 나머지 숨김
       if (items.ship) {
-        gsap.to(items.ship, {
-          scale: () => {
-            const r = items.ship!.getBoundingClientRect();
-            return window.innerHeight / Math.max(1, r.height);
-          },
-          x: () => {
-            const r = items.ship!.getBoundingClientRect();
-            return -r.left;
-          },
-          y: () => {
-            const r = items.ship!.getBoundingClientRect();
-            return -r.top;
-          },
-          transformOrigin: "top left",
-          ease: "none",
-          scrollTrigger: {
-            trigger: document.body,
-            invalidateOnRefresh: true,
-            start: () => {
-              const el = document.querySelector<HTMLElement>("#phase2-content");
-              const y = el
-                ? el.getBoundingClientRect().top + window.scrollY
-                : 0;
-              const afterHeroEndY = y + 200 + window.innerHeight * 1.1;
-              const gapEndY = afterHeroEndY + 300 + window.innerHeight * 0.35;
-              return `top+=${gapEndY + 40} top`;
+        const shipEl = items.ship;
+        gsap.fromTo(
+          shipEl,
+          { scale: 1, x: 0, y: 0 },
+          {
+            scale: () => {
+              const r = shipEl.getBoundingClientRect();
+              return window.innerHeight / Math.max(1, r.height);
             },
-            end: () => {
-              const el = document.querySelector<HTMLElement>("#phase2-content");
-              const y = el
-                ? el.getBoundingClientRect().top + window.scrollY
-                : 0;
-              const afterHeroEndY = y + 200 + window.innerHeight * 1.1;
-              const gapEndY = afterHeroEndY + 300 + window.innerHeight * 0.35;
-              return `top+=${gapEndY + 40 + window.innerHeight * 0.9} top`;
+            x: () => {
+              const r = shipEl.getBoundingClientRect();
+              const curX = Number(gsap.getProperty(shipEl, "x")) || 0;
+              return -(r.left - curX);
             },
-            scrub: 1,
+            y: () => {
+              const r = shipEl.getBoundingClientRect();
+              const curY = Number(gsap.getProperty(shipEl, "y")) || 0;
+              return -(r.top - curY);
+            },
+            transformOrigin: "top left",
+            ease: "none",
+            immediateRender: false,
+            scrollTrigger: {
+              trigger: document.body,
+              start: () => {
+                const el =
+                  document.querySelector<HTMLElement>("#phase2-content");
+                const y = el
+                  ? el.getBoundingClientRect().top + window.scrollY
+                  : 0;
+                const afterHeroEndY = y + 200 + window.innerHeight * 1.1;
+                const gapEndY =
+                  afterHeroEndY + 300 + window.innerHeight * 0.35;
+                return `top+=${gapEndY + 40} top`;
+              },
+              end: () => {
+                const el =
+                  document.querySelector<HTMLElement>("#phase2-content");
+                const y = el
+                  ? el.getBoundingClientRect().top + window.scrollY
+                  : 0;
+                const afterHeroEndY = y + 200 + window.innerHeight * 1.1;
+                const gapEndY =
+                  afterHeroEndY + 300 + window.innerHeight * 0.35;
+                return `top+=${gapEndY + 40 + window.innerHeight * 0.9} top`;
+              },
+              scrub: 1,
+            },
           },
-        });
+        );
       }
 
       if (nonShipItems.length > 0) {
