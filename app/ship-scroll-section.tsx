@@ -50,6 +50,16 @@ export function ShipScrollSection() {
     gsap.set([...shipItem, ...afterHeroItems], { opacity: 1 });
 
     const ctx = gsap.context(() => {
+      /** 사진 간격(--pad)이 벌어지는 구간의 스크롤 길이 (뷰포트 높이 배수) */
+      const SPREAD_SCROLL_VH = 0.55;
+      /** 간격 애니메이션 종료 후 선박 확대가 시작되기까지 추가 스크롤 */
+      const POST_SPREAD_BEFORE_SHIP_VH = 0.26;
+
+      const gapScrollEndY = (afterHeroEndY: number) =>
+        afterHeroEndY + 300 + window.innerHeight * SPREAD_SCROLL_VH;
+      const shipZoomStartY = (afterHeroEndY: number) =>
+        gapScrollEndY(afterHeroEndY) + 40 + window.innerHeight * POST_SPREAD_BEFORE_SHIP_VH;
+
       // Phase 1: hero를 고정(pin)하고 ship만 먼저 올라옴
       gsap.to(shipItem, {
         y: 0,
@@ -107,7 +117,7 @@ export function ShipScrollSection() {
                 ? el.getBoundingClientRect().top + window.scrollY
                 : 0;
               const afterHeroEndY = y + 200 + window.innerHeight * 1.1;
-              return `top+=${afterHeroEndY + 300 + window.innerHeight * 0.35} top`;
+              return `top+=${gapScrollEndY(afterHeroEndY)} top`;
             },
             scrub: 1,
           },
@@ -152,9 +162,7 @@ export function ShipScrollSection() {
                   ? el.getBoundingClientRect().top + window.scrollY
                   : 0;
                 const afterHeroEndY = y + 200 + window.innerHeight * 1.1;
-                const gapEndY =
-                  afterHeroEndY + 300 + window.innerHeight * 0.35;
-                return `top+=${gapEndY + 40} top`;
+                return `top+=${shipZoomStartY(afterHeroEndY)} top`;
               },
               end: () => {
                 const el =
@@ -163,9 +171,7 @@ export function ShipScrollSection() {
                   ? el.getBoundingClientRect().top + window.scrollY
                   : 0;
                 const afterHeroEndY = y + 200 + window.innerHeight * 1.1;
-                const gapEndY =
-                  afterHeroEndY + 300 + window.innerHeight * 0.35;
-                return `top+=${gapEndY + 40 + window.innerHeight * 0.9} top`;
+                return `top+=${shipZoomStartY(afterHeroEndY) + window.innerHeight * 0.9} top`;
               },
               scrub: 1,
             },
@@ -187,8 +193,7 @@ export function ShipScrollSection() {
                 ? el.getBoundingClientRect().top + window.scrollY
                 : 0;
               const afterHeroEndY = y + 200 + window.innerHeight * 1.1;
-              const gapEndY = afterHeroEndY + 300 + window.innerHeight * 0.35;
-              return `top+=${gapEndY + 40} top`;
+              return `top+=${shipZoomStartY(afterHeroEndY)} top`;
             },
             end: () => {
               const el = document.querySelector<HTMLElement>("#phase2-content");
@@ -196,8 +201,7 @@ export function ShipScrollSection() {
                 ? el.getBoundingClientRect().top + window.scrollY
                 : 0;
               const afterHeroEndY = y + 200 + window.innerHeight * 1.1;
-              const gapEndY = afterHeroEndY + 300 + window.innerHeight * 0.35;
-              return `top+=${gapEndY + 40 + window.innerHeight * 0.45} top`;
+              return `top+=${shipZoomStartY(afterHeroEndY) + window.innerHeight * 0.45} top`;
             },
             scrub: 1,
           },
@@ -211,15 +215,13 @@ export function ShipScrollSection() {
           const el = document.querySelector<HTMLElement>("#phase2-content");
           const y = el ? el.getBoundingClientRect().top + window.scrollY : 0;
           const afterHeroEndY = y + 200 + window.innerHeight * 1.1;
-          const gapEndY = afterHeroEndY + 300 + window.innerHeight * 0.35;
-          return `top+=${gapEndY + 40} top`;
+          return `top+=${shipZoomStartY(afterHeroEndY)} top`;
         },
         end: () => {
           const el = document.querySelector<HTMLElement>("#phase2-content");
           const y = el ? el.getBoundingClientRect().top + window.scrollY : 0;
           const afterHeroEndY = y + 200 + window.innerHeight * 1.1;
-          const gapEndY = afterHeroEndY + 300 + window.innerHeight * 0.35;
-          return `top+=${gapEndY + 40 + window.innerHeight * 0.9} top`;
+          return `top+=${shipZoomStartY(afterHeroEndY) + window.innerHeight * 0.9} top`;
         },
         scrub: 1,
         onUpdate: (self) => {
