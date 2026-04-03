@@ -43,7 +43,7 @@ export function BusinessIntroSection() {
 
     imgEls.forEach((el) => gsap.set(el, { opacity: 0 }));
     labelEls.forEach((el, i) =>
-      gsap.set(el, { color: i === 0 ? "var(--tbm-blue)" : "#000" }),
+      gsap.set(el, { color: i === 0 ? "#056BDB" : "#101116" }),
     );
     descEls.forEach((el, i) => {
       if (i === 0) {
@@ -75,7 +75,7 @@ export function BusinessIntroSection() {
 
       labelEls.forEach((el, i) => {
         gsap.to(el, {
-          color: i === index ? "var(--tbm-blue)" : "#000",
+          color: i === index ? "#056BDB" : "#101116",
           duration: 0.3,
         });
       });
@@ -136,7 +136,17 @@ export function BusinessIntroSection() {
         className="pointer-events-none fixed right-0 top-0 z-50 flex h-screen w-[55%] flex-col justify-center bg-white pl-16 pr-8"
         style={{ opacity: 0 }}
       >
-        <p className="mb-6 text-[14px] font-semibold text-(--tbm-blue)">
+        <p
+          className="mb-6"
+          style={{
+            fontFamily: "NeoHyundai, sans-serif",
+            fontWeight: 800,
+            fontSize: "18px",
+            lineHeight: "22px",
+            letterSpacing: "0.02em",
+            color: "#7F0001",
+          }}
+        >
           사업소개
         </p>
         <div className="space-y-1">
@@ -144,12 +154,30 @@ export function BusinessIntroSection() {
             <div key={cat.key}>
               <h3
                 data-biz-label
-                className="cursor-default text-[28px] font-bold leading-tight"
+                className="cursor-default"
+                style={{
+                  fontFamily: "NeoHyundai, sans-serif",
+                  fontWeight: 800,
+                  fontSize: "36px",
+                  lineHeight: "36px",
+                  letterSpacing: "0.02em",
+                  color: "#101116",
+                }}
               >
                 {cat.label}
               </h3>
               <div data-biz-desc>
-                <p className="mt-1 mb-3 whitespace-pre-line text-[13px] leading-relaxed text-gray-500">
+                <p
+                  className="mt-1 mb-3 whitespace-pre-line"
+                  style={{
+                    fontFamily: "Pretendard, sans-serif",
+                    fontWeight: 400,
+                    fontSize: "14px",
+                    lineHeight: "18px",
+                    letterSpacing: "0",
+                    color: "#101116",
+                  }}
+                >
                   {cat.desc}
                 </p>
               </div>
