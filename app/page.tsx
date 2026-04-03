@@ -81,7 +81,6 @@ export default function Home() {
           <section className="min-h-screen" />
           <section className="min-h-screen" />
           <section className="min-h-screen" />
-          <section className="min-h-[50vh]" />
         </div>
       </main>
 
