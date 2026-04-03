@@ -122,8 +122,13 @@ export function ShipScrollSection() {
           { scale: 1, x: 0, y: 0 },
           {
             scale: () => {
-              const r = shipEl.getBoundingClientRect();
-              return window.innerHeight / Math.max(1, r.height);
+              // 사업소개 고정 이미지 영역(w-[45%]) 가로에 맞추기 — 높이(100vh) 채움보다 큰 배율이면 그만큼 더 확대
+              const w = shipEl.offsetWidth;
+              const h = shipEl.offsetHeight;
+              const targetW = window.innerWidth * 0.45;
+              const scaleW = targetW / Math.max(1, w);
+              const scaleH = window.innerHeight / Math.max(1, h);
+              return Math.max(scaleW, scaleH);
             },
             x: () => {
               const r = shipEl.getBoundingClientRect();
